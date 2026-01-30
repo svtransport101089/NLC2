@@ -1,11 +1,11 @@
 
-
 export interface GroupHeaderData {
   nlcNo: string;
   region: string;
   areaPastor: string;
-  leaderName: string; // Reverted to string
-  coLeader: string; // Reverted to string
+  leaderName: string;
+  coLeader: string;
+  leaderPhone: string; // Added field
   year: string;
 }
 

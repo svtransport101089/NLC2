@@ -1,16 +1,19 @@
 
 import { GoogleGenAI } from "@google/genai";
-import { GroupHeaderData, Member, QuarterlyUpdate } from "../types"; // Removed Leader import
+import { GroupHeaderData, Member, QuarterlyUpdate } from "../types";
 
+/**
+ * Service to analyze leadership reports using Gemini AI.
+ * It provides a performance assessment, identifies growth opportunities, and offers strategic advice.
+ */
 export const analyzeReport = async (
   header: GroupHeaderData,
   members: Member[],
   updates: QuarterlyUpdate[],
-  // Removed leaders: Leader[] parameter
 ): Promise<string> => {
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
+  // Use gemini-3-pro-preview for complex reasoning tasks as per guidelines
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
-  // Use header.leaderName and header.coLeader directly
   const leaderName = header.leaderName || 'Unassigned';
   const coLeaderName = header.coLeader || 'Unassigned';
   
@@ -19,6 +22,7 @@ export const analyzeReport = async (
     
     Leader: ${leaderName}
     Co-Leader: ${coLeaderName}
+    Leader Phone: ${header.leaderPhone || 'N/A'}
     Region: ${header.region}
     Members Count: ${members.length}
     
@@ -29,21 +33,23 @@ export const analyzeReport = async (
     `).join('')}
     
     Please provide:
-    1. A summary of progress.
-    2. Key areas of concern.
-    3. Actionable recommendations for the leader and co-leader.
+    1. A concise performance assessment.
+    2. Key growth opportunities or areas of concern.
+    3. Actionable strategic advice for the leadership team.
     
-    Format the response in clean markdown.
+    Format the response in professional markdown with bold highlights.
   `;
 
   try {
+    // Using gemini-3-pro-preview for complex text analysis tasks
     const response = await ai.models.generateContent({
-      model: 'gemini-3-flash-preview',
+      model: 'gemini-3-pro-preview',
       contents: prompt,
     });
+    // Correctly accessing the .text property from GenerateContentResponse
     return response.text || "No analysis available.";
   } catch (error) {
     console.error("AI Analysis failed:", error);
-    return "Failed to analyze the report. Please check your API key and connection.";
+    throw error;
   }
 };
